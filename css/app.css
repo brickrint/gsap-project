@@ -385,6 +385,9 @@ header h1 span {
 .rg__text--mask {
   overflow: hidden;
 }
+.rg__text--mask p {
+  margin: 0;
+}
 
 /* =Loader */
 .loader,
