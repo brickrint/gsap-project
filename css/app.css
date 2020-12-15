@@ -12,6 +12,7 @@
 
   --bcg-loaderblue: #758a94;
   --bcg-loaderbluedark: #566c76;
+  --bgc-fill-color: var(--bcg-green);
 
   --loader-width: 27.36vw;
   --loader-height: 50vh;
@@ -546,6 +547,9 @@ section {
   width: 100%;
   height: 100%;
   position: fixed;
+  transition: background-color 0.3s linear;
+  background-color: var(--bgc-fill-color);
+  will-change: background-color;
 }
 
 /* =Blog */

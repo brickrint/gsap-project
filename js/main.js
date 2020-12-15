@@ -145,7 +145,7 @@ function createHoverReveal(evt) {
 /* ****************************** */
 
 /* ****************************** */
-/* Reveal-gallery animations */
+/* Animate portfolio images on hover */
 const portfolioCategoriesContainer = document.querySelector(
   ".portfolio__categories"
 );
@@ -169,9 +169,6 @@ function initHoverPortfolio() {
 
 function createPortfoiloMove(evt) {
   const { clientY } = evt;
-
-  console.log(portfolioCategoriesContainer.clientHeight);
-  console.log(clientY);
 
   gsap.to(portfoliImageContainerLarge, {
     duration: 1.2,
@@ -229,13 +226,67 @@ function revealImagesOnHover(evt) {
 }
 /* ****************************** */
 
+/* ****************************** */
+/* Parallax images on scroll */
+function initImageParallax() {
+  const parallaxSections = gsap.utils.toArray(".with-parallax");
+  parallaxSections.forEach((section) => {
+    const img = section.querySelector("img");
+
+    gsap.to(img, {
+      yPercent: 20,
+      ease: "none",
+      scrollTrigger: {
+        trigger: section,
+        start: "top bottom",
+        scrub: true,
+      },
+    });
+  });
+}
+function updateFillBackground(color) {
+  document.documentElement.style.setProperty("--bgc-fill-color", color);
+}
+
+function initPinSteps() {
+  ScrollTrigger.create({
+    trigger: ".fixed-nav",
+    start: "top center",
+    endTrigger: "#stage4",
+    end: "center center",
+    pin: true,
+    markers: true,
+  });
+
+  gsap.utils.toArray(".stage").forEach((stage, index) => {
+    const navLinksItems = gsap.utils.toArray(".fixed-nav li");
+
+    ScrollTrigger.create({
+      trigger: stage,
+      start: "top center",
+      end: "top",
+      toggleClass: {
+        targets: navLinksItems[index],
+        className: "is-active",
+      },
+      onEnter: () => updateFillBackground(stage.dataset.color),
+      onEnterBack: () => updateFillBackground(stage.dataset.color),
+    });
+  });
+}
+/* ****************************** */
+
 function init() {
-  initNavigation();
-  initNavTilt();
-
-  initHoverReveal();
-
-  initHoverPortfolio();
+  /* Navigation animations */
+  // initNavigation();
+  // initNavTilt();
+  /* Reveal-gallery animations */
+  // initHoverReveal();
+  /* Animate portfolio images on hover */
+  // initHoverPortfolio();
+  /* Parallax images on scroll */
+  initImageParallax();
+  initPinSteps();
 }
 
 // window.addEventListener("load", function () {
