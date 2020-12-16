@@ -255,7 +255,6 @@ function initPinSteps() {
     endTrigger: "#stage4",
     end: "center center",
     pin: true,
-    markers: true,
   });
 
   gsap.utils.toArray(".stage").forEach((stage, index) => {
@@ -274,20 +273,158 @@ function initPinSteps() {
     });
   });
 }
+function initScrollTo() {
+  gsap.utils.toArray(".fixed-nav a").forEach((link) => {
+    const target = link.getAttribute("href");
+
+    link.addEventListener("click", (evt) => {
+      evt.preventDefault();
+
+      gsap.to(window, { duration: 1.5, scrollTo: target, ease: "Power2.out" });
+    });
+  });
+}
+/* ****************************** */
+
+/* ****************************** */
+/* Loader animations */
+const loader = document.querySelector(".loader");
+const loaderInner = document.querySelector(".loader .inner");
+const progressBar = document.querySelector(".loader .progress");
+
+gsap.set(loader, { autoAlpha: 1 });
+gsap.set(loaderInner, { scaleY: 0.005, transformOrigin: "bottom" });
+const progressTween = gsap.to(progressBar, {
+  paused: true,
+  scaleX: 0.1,
+  transformOrigin: "right",
+  ease: "none",
+});
+
+/* Init loader images */
+const container = document.querySelector("#main");
+let loadedImagesCount = 0,
+  imageCount;
+
+const imgLoad = imagesLoaded(container);
+console.log(imgLoad);
+imageCount = imgLoad.images.length;
+
+imgLoad.on("progress", () => {
+  loadedImagesCount++;
+
+  updateProgress(loadedImagesCount);
+});
+
+imgLoad.on("done", () => {
+  gsap.set(progressBar, { autoAlpha: 0, onComplete: init });
+});
+
+updateProgress(0);
+
+function updateProgress(value) {
+  gsap.to(progressTween, {
+    progress: value / imageCount,
+    duration: 0.3,
+    ease: "power1.out",
+  });
+}
+
+function initLoader() {
+  const logoOverelay = document.querySelector(".loader .inner");
+  const img = document.querySelector(".loader__image img");
+  const mask = document.querySelector(".loader__image--mask");
+  const textLine1 = document.querySelector(
+    ".loader__title--mask:nth-child(1) span"
+  );
+  const textLine2 = document.querySelector(
+    ".loader__title--mask:nth-child(2) span"
+  );
+  const textMasks = document.querySelectorAll(".loader__title--mask");
+  const loaderContent = document.querySelector(".loader__content");
+
+  const loaderTlIn = gsap.timeline({
+    defaults: {
+      duration: 1.1,
+      ease: "power2.out",
+    },
+    onComplete: () => {
+      document.querySelector("body").classList.remove("is-loading");
+    },
+  });
+
+  loaderTlIn
+    .set(loaderContent, { autoAlpha: 1 })
+    .from(logoOverelay, {
+      scaleY: 0,
+      transformOrigin: "bottom",
+    })
+    .addLabel("revealImage")
+    .from(mask, { yPercent: 100 }, "revealImage-=0.6")
+    .from(img, { yPercent: -80 }, "revealImage-=0.6")
+    .from(
+      [textLine1, textLine2],
+      { yPercent: 100, stagger: 0.1 },
+      "revealImage-=0.4"
+    );
+
+  const loaderTlOut = gsap.timeline({
+    defaults: {
+      duration: 1.2,
+      ease: "power2.inOut",
+    },
+    delay: 0.3,
+  });
+
+  loaderTlOut
+    .to(textMasks, { yPercent: -300, stagger: 0.2 }, 0)
+    .to([loader, loaderContent], { yPercent: -100 }, 0)
+    .from("#main", { y: 150 }, 0);
+
+  const mainTl = gsap.timeline();
+
+  mainTl.add(loaderTlIn).add(loaderTlOut);
+}
 /* ****************************** */
 
 function init() {
+  /* Loader animations */
+  initLoader();
+
   /* Navigation animations */
-  // initNavigation();
-  // initNavTilt();
+  initNavigation();
+  initNavTilt();
   /* Reveal-gallery animations */
-  // initHoverReveal();
+  initHoverReveal();
   /* Animate portfolio images on hover */
-  // initHoverPortfolio();
+  initHoverPortfolio();
   /* Parallax images on scroll */
   initImageParallax();
   initPinSteps();
+  initScrollTo();
 }
+
+// smooth scroll demo
+// const container = document.querySelector("#scroll-container");
+// console.log(container);
+// let height;
+// function setHeight() {
+//   height = container.clientHeight;
+//   document.body.style.height = `${height}px`;
+// }
+// ScrollTrigger.addEventListener("refreshInit", setHeight);
+
+// gsap.to(container, {
+//   y: () => -(height - document.documentElement.clientHeight),
+//   ease: "none",
+//   scrollTrigger: {
+//     trigger: document.body,
+//     start: "top top",
+//     end: "bottom bottom",
+//     scrub: 1,
+//     invalidateOnRefresh: true,
+//   },
+// });
 
 // window.addEventListener("load", function () {
 //   init();
@@ -314,7 +451,5 @@ function handleWidthChange(matchMedia) {
     removeInlineStyles(imageMask, imageBlock, image, text, textCopy, textMask);
   });
 }
-
-mq.addListener(handleWidthChange);
-
-handleWidthChange(mq);
+// mq.addListener(handleWidthChange);
+// handleWidthChange(mq);
